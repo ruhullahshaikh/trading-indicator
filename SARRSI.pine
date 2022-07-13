@@ -1,0 +1,30 @@
+// @version=5
+
+strategy(title="SAR + Super Trend", shorttitle="SARSPTRD", overlay=true, margin_long=100, margin_short=100)
+
+// Supertrend
+atrPeriod = input(10, "ATR Length")
+factor = input.float(3.0, "Factor", step = 0.01)
+
+[supertrend, direction] = ta.supertrend(factor, atrPeriod)
+bodyMiddle = plot((open + close) / 2, display=display.none)
+upTrend = plot(direction < 0 ? supertrend : na, "Up Trend", color = color.green, style=plot.style_linebr)
+downTrend = plot(direction < 0? na : supertrend, "Down Trend", color = color.red, style=plot.style_linebr)
+
+
+fill(bodyMiddle, upTrend, color.new(color.green, 90), fillgaps=false)
+fill(bodyMiddle, downTrend, color.new(color.red, 90), fillgaps=false)
+
+// SAR
+start = input(0.02)
+increment = input(0.02)
+maximum = input(0.2, "Max Value")
+out = ta.sar(start, increment, maximum)
+
+plot(out, "ParabolicSAR", style=plot.style_cross, color=#2962FF)
+
+if direction==-1
+    strategy.entry("Buy", strategy.long)
+    
+if direction==1
+    strategy.entry("Sell", strategy.short)
